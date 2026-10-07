@@ -1,0 +1,32 @@
+""" Ejercicio 1 - Cadena LCEL: prompt | modelo | parser """
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import ChatOllama
+
+# 1. Defines lo que el modelo necesita hacer con la entrada(restricciones/=, formato) y defines {texto} que sera la entrada de texto a convertir a viñetas
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "Eres un experto en resumen. Devuelve el resumen del texto ingresado en 3 viñetas cortas, sin comentarios."),
+    ("human", "{texto}"),
+])
+
+# 2. Defines el provvedor del modelo a usar. Temperatura define que tan abierto a la creatividad es el modelo. 0 = muy cerrado, 1 = muy abierto
+modelo = ChatOllama(model="llama3.1", temperature=0)
+
+# 3. Parser se queda con el texto limpio que se necesita para la salida final.
+parser = StrOutputParser()
+
+# 4. LCEL crea una cadena de ejecucion.
+cadena = prompt | modelo | parser
+
+if __name__ == "__main__":
+    # Resumen Don Quijote de la Mancha.
+    #entrada = {"texto": "Don Quijote de la Mancha, obra maestra de Miguel de Cervantes, relata las andanzas de Alonso Quijano, un hidalgo empobrecido que pierde el juicio de tanto leer libros de caballerías y decide convertirse en un caballero andante bajo el nombre de Don Quijote. A lomos de su viejo caballo Rocinante y acompañado por su pragmático escudero Sancho Panza, recorre las tierras de España deformando la realidad a través de sus fantasías, lo que le lleva a confundir molinos de viento con gigantes o ventas ordinarias con castillos, todo con el fin de honrar a su amada idealizada, Dulcinea del Toboso. Tras encadenar múltiples fracasos, golpizas y situaciones ridículas provocadas por su idealismo chocando con un mundo real y burlesco, sus amigos logran engañarlo para que regrese a su hogar, donde finalmente recobra la cordura justo antes de morir en paz."}
+
+    # Resumen Juan salvador Gaviota.
+    entrada = {"texto": "Juan Salvador Gaviota, la célebre novela de Richard Bach, narra la historia de una gaviota inconformista que prefiere perfeccionar su técnica de vuelo y experimentar la libertad antes que limitarse a buscar comida como el resto de su mediocre bandada. Debido a su desobediencia y pasión por las acrobacias, es exiliado por los líderes de su comunidad, pero lejos de rendirse, continúa practicando en solitario hasta que asciende a un plano superior de existencia. Allí es guiado por instructores como Rafael y el anciano Chiang, quienes le enseñan a superar las barreras del tiempo, el espacio y el propio pensamiento. Finalmente, motivado por el amor y la compasión, Juan regresa a la Tierra para convertirse en maestro de otras gaviotas marginadas, demostrándoles que los límites físicos no existen y que el verdadero propósito de la vida es alcanzar el máximo potencial interior."}
+    
+    salida = cadena.invoke(entrada)
+    print("ENTRADA :", entrada["texto"])
+    print("SALIDA  :", salida)
+
